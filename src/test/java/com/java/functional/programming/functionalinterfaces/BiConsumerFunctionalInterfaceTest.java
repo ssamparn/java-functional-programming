@@ -6,17 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-// A consumer functional interface accepts a generified argument and returns nothing.
-// It is a function that is representing side effects.
+
 @Slf4j
-public class ConsumerFunctionalInterfaceTest {
+public class BiConsumerFunctionalInterfaceTest {
 
     @Test
-    public void consumer_functional_interface_test() {
-        Consumer<String> stringConsumer = string -> log.info("The string passed in consumer is: {}", string.length());
-        stringConsumer.accept("Sashank");
+    public void bi_consumer_functional_interface_test() {
+        BiConsumer<String, String> stringBiConsumer = (strA, strB)  -> log.info("The string(s) passed to biconsumer are: {}, {}", strA, strB);
+        stringBiConsumer.accept("Sashank", "Aparna");
+    }
+
+    @Test
+    public void bi_consumer_multiplication_and_division_of_integers() {
+        BiConsumer<Integer, Integer> multiply = (a, b) -> log.info("Multiplication is: {}", a * b);
+        BiConsumer<Integer, Integer> division = (a, b) -> log.info("Multiplication is: {}", a / b);
+
+        multiply.andThen(division).accept(10, 5);
     }
 
     @Test
@@ -29,7 +37,10 @@ public class ConsumerFunctionalInterfaceTest {
     @Test
     public void get_studentnames_and_activies_test1() {
         List<Student> studentList = StudentDatabase.getAllStudents();
-        studentList.forEach(student -> log.info("Student name is: {} and his / her activities are: {}", student.getName(), student.getActivities()));
+
+        BiConsumer<String, List<String>> studentBiConsumer = (studentName, studentActivities) -> log.info("Student name is: {} and his / her activities are: {}", studentName, studentActivities);
+
+        studentList.forEach(student -> studentBiConsumer.accept(student.getName(), student.getActivities()));
     }
 
     @Test
@@ -50,4 +61,10 @@ public class ConsumerFunctionalInterfaceTest {
             }
         });
     }
+
+    // Another set of specialized BiConsumer versions comprises
+    // ObjDoubleConsumer,
+    // ObjIntConsumer,
+    // ObjLongConsumer
+    // which receive two arguments; one of the arguments is generified, and the other is a primitive type.
 }
