@@ -43,25 +43,6 @@ public class BiConsumerFunctionalInterfaceTest {
         studentList.forEach(student -> studentBiConsumer.accept(student.getName(), student.getActivities()));
     }
 
-    @Test
-    public void get_studentnames_and_activies_test2() {
-        List<Student> studentList = StudentDatabase.getAllStudents();
-        Consumer<Student> studentNameConsumer = student -> log.info(student.getName());
-        Consumer<Student> studentActivitiesConsumer = student -> log.info(student.getActivities().toString());
-        studentList.forEach(studentNameConsumer.andThen(studentActivitiesConsumer)); // consumer chaining
-    }
-
-    @Test
-    public void get_studentnames_and_activies_using_condition_test() {
-        List<Student> studentList = StudentDatabase.getAllStudents();
-
-        studentList.forEach(student -> {
-            if (student.getGradeLevel() >= 3 && student.getGpa() >= 3.9) {
-                log.info("Students with Grade Level >= 3 and Gpa Level >= 3.9 are: {}", student.getName());
-            }
-        });
-    }
-
     // Another set of specialized BiConsumer versions comprises
     // ObjDoubleConsumer,
     // ObjIntConsumer,
