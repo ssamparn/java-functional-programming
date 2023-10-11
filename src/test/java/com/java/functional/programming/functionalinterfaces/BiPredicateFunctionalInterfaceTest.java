@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class BiPredicateFunctionalInterfaceTest {
