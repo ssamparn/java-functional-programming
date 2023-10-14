@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 public class LambdaExpressionTest {
@@ -72,4 +73,64 @@ public class LambdaExpressionTest {
         System.out.println(allStudents);
     }
 
+    // Lambdas and Local Variables.
+
+    /**
+     * What is a Local Variable?
+     * Any variable that is declared inside a method is called a local variable.
+     *
+     * Lambdas have some restrictions on using the local variable.
+     *      1. Not allowed to use the same local variable name as lambda parameter or inside lambda body.
+     *      2. Not allowed to re-assign a value to a local variable.
+     But Lambda does not have such restrictions on instance variable.
+     * */
+
+    /**
+     * Variable defined by the enclosing scope of a lambda expression are accessible within the lambda expression.
+     * For example, a lambda expression can use an instance or static variable defined by its enclosing class.
+     *
+     * However, when a lambda expression uses a local variable from its enclosing scope,
+     * a special situation is created that is referred to as a variable capture.
+     * In this case, a lambda expression may only use local variables that are effectively final.
+     * An effectively final variable is one whose value does not change after it is first assigned.
+     * There is no need to explicitly declare such a variable as final, although doing so would not be an error.
+     * */
+    @Test
+    public void lambda_local_variable_case_1_test() {
+        // case: 1. variable is already defined in scope
+        int i = 0;
+        // Consumer<Integer> intConsumer = i -> System.out.println("Value is: " + i);
+    }
+
+    @Test
+    public void lambda_local_variable_case_2_test() {
+
+        // case: 2. reassigning an instance variable is with a new value. As variable used in lambda expression must be final or effectively final.
+
+        int value = 4;
+
+        Consumer<Integer> intConsumer = i -> {
+//            value++; // Not allowed
+            System.out.println("Value is: " + value);
+        };
+
+//        value = 6;   // Not allowed
+
+        intConsumer.accept(4);
+    }
+
+    static int value = 4;
+
+    @Test
+    public void lambda_local_variable_case_3_test() {
+        // case: 3. reassigning a static variable is with a new value.
+
+        Consumer<Integer> intConsumer = i -> {
+            value++;
+            System.out.println("Value is: " + value);
+        };
+
+        value = 6;
+        intConsumer.accept(value);
+    }
 }
