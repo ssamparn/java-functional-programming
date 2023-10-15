@@ -15,4 +15,5 @@ public class Student {
     private double gpa;
     private String gender;
     private List<String> activities;
+    private int noteBooks;
 }
