@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
@@ -52,6 +53,25 @@ public class StreamsApiTest {
 
     // iterate() and generate() are used to create infinite streams.
 
+    // iterate(): One way of creating an infinite stream is by using the iterate() method.
+    @Test
+    public void streams_api_iterate_method_test() {
+        Stream<Integer> streamIterated = Stream
+                .iterate(1, n -> n + 2)
+                .limit(5);
+
+        System.out.println(streamIterated.collect(toList())); // [1, 3, 5, 7, 9]
+
+    }
+
+    // generate(): The generate() method accepts a Supplier<T> for element generation.
+    // As the resulting stream is infinite, the developer should specify the desired size, or the generate() method will work until it reaches the memory limit.
+    @Test
+    public void streams_api_generate_method_test() {
+        Stream<String> streamGenerated = Stream.generate(() -> "element").limit(10);
+
+        System.out.println(streamGenerated.collect(toList()));
+    }
 
     @Test
     public void streams_api_test() {
@@ -423,4 +443,218 @@ public class StreamsApiTest {
         boolean isNonNegativeNumber = noneMatchNumberStream.noneMatch(n -> n < 1);
         System.out.println(isNonNegativeNumber); //prints false.
     }
+
+    /**
+     * Primitive streams are limited mainly because of boxing overhead and because creating specialized streams for other primitives isn’t that useful in many cases.
+     * Primitive Streams or Numeric Streams: Represents the primitive values in a stream.
+     * 1. IntStream
+     * 2. LongStream
+     * 3. DoubleStream
+     * */
+
+    @Test
+    public void streams_api_int_stream_test() {
+        int sum1 = IntStream.range(1, 10)
+                .reduce(Integer::sum)
+                .getAsInt();
+
+        int sum2 = IntStream.rangeClosed(1, 10)
+                .reduce(Integer::sum)
+                .getAsInt();
+
+        System.out.println(sum1); // 10 is not included in the sum
+        System.out.println(sum2); // 10 is included in the sum
+
+        System.out.println(IntStream.range(1, 10).count()); // 10 is not included in the count
+        System.out.println(IntStream.rangeClosed(1, 10).count()); // 10 is included in the count
+    }
+
+    // boxing and unboxing in IntStream
+    // boxing: primitive type to wrapper type
+    // unboxing: wrapper type to primitive type
+    @Test
+    public void streams_api_boxing_unboxing_test() {
+
+        List<Integer> integerList = IntStream.rangeClosed(1, 10)
+                .filter(i -> i % 2 == 0)
+                .boxed()
+                .toList();
+        System.out.println(integerList);
+
+        // unboxing
+        List<Integer> list = List.of(1, 2, 3, 4, 5);
+
+        int sum = list.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        System.out.println(sum);
+    }
+
+    // mapToObj(), mapToLong() and mapToDouble()
+    @Test
+    public void streams_api_map_to_object_test() {
+        IntStream.range(3, 8)
+                .mapToObj(Integer::toBinaryString)
+                .forEach(System.out::print);
+
+        IntStream.rangeClosed(1, 5)
+                .mapToLong(i -> i)
+                .forEach(System.out::print);
+
+        IntStream.rangeClosed(1, 5)
+                .mapToDouble(i -> i)
+                .forEach(System.out::println);
+    }
+
+    /**
+     * Streams API Terminal Operations
+     * */
+
+    // joining(): The joining() method of Collectors class in Java, is used to join various elements of a character or string array into a single string object.
+    @Test
+    public void streams_api_joining_with_an_array_of_characters_test() {
+        char[] charArray = { 'G', 'e', 'e', 'k', 's', 'f', 'o',
+                'r', 'G', 'e', 'e', 'k', 's' };
+
+        String joinedString = Stream.of(charArray)
+                .map(String::new)
+                .collect(Collectors.joining());
+
+        System.out.println(joinedString);
+    }
+
+    @Test
+    public void streams_api_joining_with_list_of_characters_test() {
+        List<Character> characters = Arrays.asList(
+                'G', 'e', 'e', 'k', 's', 'f', 'o', 'r', 'G',
+                'e', 'e', 'k', 's');
+
+        String joinedString = characters.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+
+        System.out.println(joinedString);
+    }
+
+    @Test
+    public void streams_api_joining_with_list_of_strings_test() {
+        String joinedString = Arrays.asList("Geeks", "for", "Geeks")
+                .stream()
+                .collect(Collectors.joining());
+
+        System.out.println(joinedString);
+    }
+
+    @Test
+    public void streams_api_joining_with_list_of_characters_with_delimiter_test() {
+        List<Character> characters = Arrays.asList(
+                'G', 'e', 'e', 'k', 's', 'f', 'o', 'r', 'G',
+                'e', 'e', 'k', 's');
+
+        String joinedString = characters.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+
+        System.out.println(joinedString);
+    }
+
+    @Test
+    public void streams_api_joining_with_list_of_strings_with_prefix_and_suffix_test() {
+        String joinedString = Arrays.asList("Geeks", "for", "Geeks")
+                .stream()
+                .collect(Collectors.joining(" ", "{", "}"));
+
+        System.out.println(joinedString);
+    }
+
+    @Test
+    public void streams_api_print_all_student_names_with_a_proper_format_test() {
+        List<Student> allStudents = StudentDatabase.getAllStudents();
+
+        String formattedStudentNames = allStudents.stream()
+                .map(Student::getName)
+                .collect(Collectors.joining(" - ", "( ", " )"));
+
+        System.out.println(formattedStudentNames);
+    }
+
+    // counting():
+    @Test
+    public void streams_api_counting_test() {
+        // find the total number of students received from the database
+        Long totalStudents = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(counting()); // can be replaced with count()
+
+        System.out.println(totalStudents);
+    }
+
+    // mapping(): mapping() of collector applies a transformation function first and then collects the data in a collection (could be any type of collection)
+    @Test
+    public void streams_api_mapping_test() {
+        List<String> studentNamesWithMapping = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.mapping(Student::getName, toList())); // collect(mapping())' can be replaced with 'map().collect()
+        System.out.println(studentNamesWithMapping);
+
+        List<String> studentNames = StudentDatabase.getAllStudents()
+                .stream()
+                .map(Student::getName)
+                .collect(toList());
+        System.out.println(studentNames);
+    }
+
+    // maxBy() and minBy(): maxBy() and minBy() receives a Comparator as an input parameter and Optional as an Output.
+    // maxBy() and minBy() returns the largest and smallest element according to a given Comparator.
+
+    @Test
+    public void streams_api_max_by_min_by_test() {
+        Optional<Student> studentWithHighestGpa = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.maxBy(Comparator.comparing(Student::getGpa))); // collect(maxBy())' can be replaced with 'max()
+        studentWithHighestGpa.ifPresent(System.out::println);
+
+
+        Optional<Student> studentWithHighestGpa1 = StudentDatabase.getAllStudents()
+                .stream()
+                .max(Comparator.comparing(Student::getGpa));
+        studentWithHighestGpa1.ifPresent(System.out::println);
+
+
+        Optional<Student> studentWithLowestGpa = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.minBy(Comparator.comparing(Student::getGpa))); // collect(maxBy())' can be replaced with 'max()
+        studentWithLowestGpa.ifPresent(System.out::println);
+
+
+        Optional<Student> studentWithLowestGpa1 = StudentDatabase.getAllStudents()
+                .stream()
+                .min(Comparator.comparing(Student::getGpa));
+        studentWithLowestGpa1.ifPresent(System.out::println);
+    }
+
+    // summingInt(): summingInt() method of Collector is going to return the sum as a result.
+    // avearagingInt(): averagingInt() method of Collector is going to return the average as a result.
+
+    @Test
+    public void streams_api_summing_averaging_int_test() {
+        Integer sumOfAllNoteBooks = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.summingInt(Student::getNoteBooks)); // collect(summingInt())' can be replaced with 'mapToInt().sum()
+        System.out.println(sumOfAllNoteBooks);
+
+        Integer sumOfAllNoteBooks1 = StudentDatabase.getAllStudents()
+                .stream()
+                .mapToInt(Student::getNoteBooks).sum();
+        System.out.println(sumOfAllNoteBooks1);
+
+        Double averageOfAllNoteBooks = StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.averagingInt(Student::getNoteBooks));
+        System.out.println(averageOfAllNoteBooks);
+    }
+
+    /**
+     * grouping():
+     * */
 }
