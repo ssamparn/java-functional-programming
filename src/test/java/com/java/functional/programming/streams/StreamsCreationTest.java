@@ -18,30 +18,39 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.maxBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
-// Simply put, streams are wrappers around a data source, allowing us to operate with that data source and making bulk processing convenient and fast.
-// A stream does not store data and, in that sense, is not a data structure. It also never modifies the underlying data source.
+/* *
+ * Simply put, streams are wrappers around a data source, allowing us to operate with that data source and making bulk processing convenient and fast.
+ * A stream does not store data and, in that sense, is not a data structure. It also never modifies the underlying data source.
+ * Introduced in Java 8, the Stream API is used to process collections of objects.
+ * A stream is a sequence of objects that supports various methods which can be pipelined to produce the desired result.
+ *
+ * Stream Creation: There are many ways to create a stream instance of different sources.
+ * Once created, the instance will not modify its source, therefore allowing the creation of multiple instances from a single source.
+ * */
 @Slf4j
-public class StreamsApiTest {
+public class StreamsCreationTest {
 
-    // Introduced in Java 8, the Stream API is used to process collections of objects.
-    // A stream is a sequence of objects that supports various methods which can be pipelined to produce the desired result.
-
-    // There are many ways to create a stream instance of different sources.
-    // Once created, the instance will not modify its source, therefore allowing the creation of multiple instances from a single source.
+    /* *
+     * Stream.empty(): We often use the empty() method upon creation to avoid returning null for streams with no element
+     * */
     @Test
     public void empty_stream_creation_test() {
-        Stream<String> emptyStream = Stream.empty(); // We often use the empty() method upon creation to avoid returning null for streams with no element
+        Stream<String> emptyStream = Stream.empty();
     }
 
-    // of(): creates a stream of certain values passed to this method.
+    /* *
+     * Stream.of(): creates a stream of certain values passed to this method.
+     * */
     @Test
     public void stream_from_collection_creation_test() {
         Collection<String> collection = Arrays.asList("a", "b", "c");
@@ -54,26 +63,29 @@ public class StreamsApiTest {
         // otherwise the build() method will create an instance of the Stream<Object>:
     }
 
-    // iterate() and generate() are used to create infinite streams.
-
-    // iterate(): One way of creating an infinite stream is by using the iterate() method.
+    /* *
+     * Stream.iterate() and Stream.generate() are used to create infinite streams.
+     * iterate(): One way of creating an infinite stream is by using the iterate() method.
+     * */
     @Test
     public void streams_api_iterate_method_test() {
         Stream<Integer> streamIterated = Stream
                 .iterate(1, n -> n + 2)
                 .limit(5);
 
-        System.out.println(streamIterated.collect(toList())); // [1, 3, 5, 7, 9]
+        log.info("{}", streamIterated.collect(toList())); // [1, 3, 5, 7, 9]
 
     }
 
-    // generate(): The generate() method accepts a Supplier<T> for element generation.
-    // As the resulting stream is infinite, the developer should specify the desired size, or the generate() method will work until it reaches the memory limit.
+    /* *
+     * generate(): The generate() method accepts a Supplier<T> for element generation.
+     * As the resulting stream is infinite, the developer should specify the desired size, or the generate() method will work until it reaches the memory limit.
+     * */
     @Test
     public void streams_api_generate_method_test() {
         Stream<String> streamGenerated = Stream.generate(() -> "element").limit(10);
 
-        System.out.println(streamGenerated.collect(toList()));
+        log.info("{}", streamGenerated.collect(toList()));
     }
 
     @Test
@@ -85,9 +97,12 @@ public class StreamsApiTest {
                 .filter(student -> student.getGpa() >= 3.9)
                 .collect(Collectors.toMap(Student::getName, Student::getActivities));
 
-        System.out.println(studentNameActivitiesMap);
+        log.info("{}", studentNameActivitiesMap);
     }
 
+    /* *
+     * Stream.peek()
+     * */
     @Test
     public void debug_streams_api_test() {
         List<Student> allStudents = StudentDatabase.getAllStudents();
@@ -98,59 +113,11 @@ public class StreamsApiTest {
                 .filter(student -> student.getGpa() >= 3.9)
                 .collect(Collectors.toMap(Student::getName, Student::getActivities));
 
-        System.out.println(studentNameActivitiesMap);
+        log.info("{}", studentNameActivitiesMap);
     }
 
-    /**
-     * Stream API Operations
-     * */
-    @Test
-    public void streams_api_map_method_test() {
-        List<Student> allStudents = StudentDatabase.getAllStudents();
-
-        Set<String> studentNames = allStudents.stream()
-                .map(Student::getName)
-                .map(String::toUpperCase)
-                .collect(Collectors.toSet());
-
-        System.out.println(studentNames);
-    }
-
-    // Both map() and flatMap() are used for transformation and mapping operations.
-    // map() function produces one output for one input value, whereas flatMap() function produces an arbitrary no of values as output (ie zero or more than zero) for each input value.
-    // One-to-one mapping occurs in map(), whereas One-to-many mapping occurs in flatMap().
-    // map() is used only for transformation, where as flatMap() is used both for transformation and mapping.
-
-    @Test
-    public void streams_api_flatmap_method_test() {
-        List<Student> allStudents = StudentDatabase.getAllStudents();
-
-        List<String> studentNameLenghts = allStudents.stream()
-                .map(Student::getActivities)
-                .flatMap(List::stream)
-                .toList();
-
-        System.out.println(studentNameLenghts);
-    }
-
-    // distinct(): Returns a stream with unique elements.
-    @Test
-    public void streams_api_distinct_method_test() {
-        List<String> stringList = Arrays.asList("A", "B", "C", "D", "A", "B", "C");
-        List<String> distinctChars = stringList.stream()
-                .distinct()
-                .toList();
-        System.out.println(distinctChars);
 
 
-        List<Student> allStudents = StudentDatabase.getAllStudents();
-        List<String> activitiesList = allStudents.stream()
-                .map(Student::getActivities)
-                .flatMap(List::stream)
-                .distinct()
-                .toList();
-        System.out.println(activitiesList);
-    }
 
     // count(): Returns a long with total number of elements in the stream.
     @Test
@@ -656,69 +623,6 @@ public class StreamsApiTest {
                 .collect(Collectors.averagingInt(Student::getNoteBooks));
         System.out.println(averageOfAllNoteBooks);
     }
-
-    /**
-     * groupingBy() groupingByConcurrent() : These 2 static factory methods Collectors.groupingBy() and Collectors.groupingByConcurrent()
-     * provide us with functionality similar to the ‘GROUP BY’ clause in the SQL language.
-     * We use them for grouping objects by some property and storing results in a Map instance.
-     * There are 3 different versions of groupingBy().
-        1. groupingBy(classifier)
-        2. groupingBy(classifier, downstream)
-        3. groupingBy(classifier, supplier, downstream)
-     * */
-
-    @Test
-    public void streams_api_grouping_by_simple_test() {
-        Map<String, List<Student>> studentsGroupedByGender = StudentDatabase.getAllStudents()
-                .stream()
-                .collect(Collectors.groupingBy(Student::getGender));
-
-        System.out.println(studentsGroupedByGender); // This map will have 2 entries. Male and Female
-        System.out.println(studentsGroupedByGender.get("Male"));
-        System.out.println(studentsGroupedByGender.get("Female"));
-    }
-
-    @Test
-    public void streams_api_grouping_by_students_based_on_gpa_while_assigning_custom_key_test() {
-        Map<String, List<Student>> studentsGroupedByGpa = StudentDatabase.getAllStudents()
-                .stream()
-                .collect(Collectors.groupingBy(student -> student.getGpa() >= 3.8 ? "OUTSTANDING" : "AVERAGE"));
-
-        System.out.println(studentsGroupedByGpa); // This map will have 2 entries. OUTSTANDING and AVERAGE
-        System.out.println(studentsGroupedByGpa.get("OUTSTANDING"));
-        System.out.println(studentsGroupedByGpa.get("AVERAGE"));
-    }
-
-    @Test
-    public void streams_api_grouping_by_students_based_on_name_and_student_gpa_test() {
-        Map<String, Map<String, List<Student>>> studentsMap = StudentDatabase.getAllStudents()
-                .stream()
-                .collect(Collectors.groupingBy(Student::getName,
-                        Collectors.groupingBy(student -> student.getGpa() >= 3.8 ? "OUTSTANDING" : "AVERAGE")));
-
-        System.out.println(studentsMap);
-    }
-
-    @Test
-    public void streams_api_grouping_by_student_names_and_count_their_notebooks_and_sort_them_based_on_their_name_test() {
-        Map<String, Integer> studentNoteBooks = StudentDatabase.getAllStudents()
-                .stream()
-                .collect(Collectors.groupingBy(Student::getName, Collectors.summingInt(Student::getNoteBooks)))
-                .entrySet()
-                .stream().sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-
-        System.out.println(studentNoteBooks);
-    }
-
-    @Test
-    public void streams_api_grouping_by_student_names_and_put_them_in_a_set_test() {
-        LinkedHashMap<String, Set<Student>> studentSetinAMap = StudentDatabase.getAllStudents()
-                .stream()
-                .collect(groupingBy(Student::getName, LinkedHashMap::new, toSet()));
-        System.out.println(studentSetinAMap);
-    }
-
 
 
 }
