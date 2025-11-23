@@ -29,13 +29,44 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
 /* *
+ * Java Streams<T>:
  * Simply put, streams are wrappers around a data source, allowing us to operate with that data source and making bulk processing convenient and fast.
  * A stream does not store data and, in that sense, is not a data structure. It also never modifies the underlying data source.
  * Introduced in Java 8, the Stream API is used to process collections of objects.
  * A stream is a sequence of objects that supports various methods which can be pipelined to produce the desired result.
  *
- * Stream Creation: There are many ways to create a stream instance of different sources.
- * Once created, the instance will not modify its source, therefore allowing the creation of multiple instances from a single source.
+ * Java Stream Creation: There are many ways to create a stream instance of different sources.
+ * Once created, the instance will not / can not modify its source, therefore allowing the creation of multiple instances from a single source.
+ *
+ * Understanding a Java Stream pipeline:
+ * In a Java stream pipeline, the data flows from the source to the terminal operation. In between we can have zero or more intermediate operators.
+ * The Java stream will have some source. The source could be any collection like list or set or an array. We can also use a supplier etc. just by invoking supplier again and again we can create the stream of data.
+ * Intermediate operators build the stream pipeline to transform the stream into another stream.
+ * As we can have zero or more intermediate operators which are lazy in nature as the data will flow via this pipeline only when we add a terminal operator.
+ * The terminal operator is the last operation in the stream pipeline, which might return a result like a list, or it can perform some action, for example using the for-each method, etc.
+ * We call this everything together a Java Stream pipeline which contains a source, one or few intermediate & one terminal operator.
+ * Only when we have the terminal operator, the data will flow from the source. This Java Stream pipeline is not a data structure.
+ *
+ * Short-circuiting Streams:
+ * It is a way of ending the stream early, instead of processing all the items in the stream.
+ * For example, your requirement could be like. Find the first number which is divisible by 3 in a stream of integers.
+ * In that case, your stream source is a List<Integer>. Let's imagine like that it might have million numbers will be processed one by one.
+ * As soon as we find the very first number which is divisible by 3, Just stop processing. So this is called short-circuiting.
+ *
+ * Stateless operators:
+ * The intermediate operators could be stateless or stateful operator.
+ * When we say stateless operator, a spot of that each element is processed independently.
+ * It does not need to know anything about the other items in the stream since each item is handled independently, it can be parallelized easily.
+ * e.g: Operators like map(), filter(), etc. these are stateless operators.
+ *
+ * Stateful operators:
+ * The stateful operator needs to know about other elements in the stream.
+ * For example, if you are trying to find unique items, how do you know an item is unique?
+ * Only by comparing it with other items you have already seen in the stream, right?
+ * e.g: Operators like count(), sum(), sorted(), distinct(), etc. You have to remember something as you keep processing the elements.
+ * So that is what makes them stateful.
+ * These operations can also be parallelized, but there might be some challenges involved.
+ *
  * */
 @Slf4j
 public class StreamsCreationTest {
