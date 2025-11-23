@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
  * Goal is to understand how integrator works with downstream
  * */
 @Slf4j
-public class IntegratorWorkingWithDownstreamTest {
+public class StreamIntegratorWorkingWithDownstreamTest {
 
     /**
      * In Java 24+, Gatherer.of(Integrator) is a convenience factory method that builds a stateless gatherer
