@@ -28,14 +28,14 @@ import lombok.extern.slf4j.Slf4j;
  * but we were 1. Unable to batch items,
  *             2. Could not control concurrency
  *             3. It lacked extensibility. We could not come up with our own custom operator.
- * Basically, we were forced to use whatever Java team provided as part of the stream API.
+ * Basically, we were forced to use whatever Java team provided as part of the streams API.
  *
  * Finally, Java Team has introduced a gatherer API which will allow us to extend the stream API.
  * Using this now like filter(), map() or flatMap(), we can create our own operator.
  *
  * For example, if we have a list of stock prices, we can create something called movingAverage().
- * Our domain specific operator to compute the 200 day moving average. We could not do that before.
- * Now we can have elegant reusable solution like this using the gatherer API.
+ * Our domain specific operator to compute the 200-day moving average. We could not do that before.
+ * Now we can have an elegant reusable solution like this using the gatherer API.
  *
  * Similarly, if we have a list of URLs, say 100 URLs or thousands of URLs, I can have an operator called executeConcurrent()
  * which will be sending hundreds of concurrent requests using virtual threads under the hood, and emit responses via the stream pipeline.
