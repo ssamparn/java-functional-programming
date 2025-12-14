@@ -1,4 +1,4 @@
-package com.java.functional.programming.streamgatherers.hierarchicaldatastructure;
+package com.java.functional.programming.streamgatherers.finisher.hierarchicaldatastructure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
