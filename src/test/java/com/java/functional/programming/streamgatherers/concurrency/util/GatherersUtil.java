@@ -17,4 +17,16 @@ public class GatherersUtil {
                 ExecuteConcurrent::finish
         );
     }
+
+    public static <T, R> Gatherer<T, ?, R> executeConcurrentDelayError(Function<T, R> mapperFunction) {
+        return executeConcurrentDelayError(1000, mapperFunction);
+    }
+
+    public static <T, R> Gatherer<T, ?, R> executeConcurrentDelayError(int maxConcurrency, Function<T, R> mapperFunction){
+        return Gatherer.ofSequential(
+                () -> new ExecuteConcurrentDelayError<>(maxConcurrency, mapperFunction, Executors.newVirtualThreadPerTaskExecutor()),
+                Gatherer.Integrator.ofGreedy(ExecuteConcurrentDelayError::integrate),
+                ExecuteConcurrentDelayError::finish
+        );
+    }
 }
