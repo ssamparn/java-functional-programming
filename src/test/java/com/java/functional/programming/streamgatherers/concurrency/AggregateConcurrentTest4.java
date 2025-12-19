@@ -35,10 +35,26 @@ public class AggregateConcurrentTest4 {
      * Ensure that the external service is up and running.
      * */
     @Test
-    public void nestedConcurrentTest() {
+    public void nestedConcurrencyTest() {
         IntStream.rangeClosed(1, 100)
                 .boxed()
                 .gather(GatherersUtil.aggregateConcurrent(
+                        10,
+                        RestClient::getProduct,
+                        RestClient::getRating,
+                        ProductAggregate::new
+                ))
+                .forEach(aggregatedProduct -> log.info("aggregatedProduct: {}", aggregatedProduct));
+    }
+
+    /**
+     * Ensure that the external service is up and running.
+     * */
+    @Test
+    public void nestedConcurrentWithStructuredTaskScopeTest() {
+        IntStream.rangeClosed(1, 100)
+                .boxed()
+                .gather(GatherersUtil.aggregateConcurrentWithStructuredConcurrency(
                         10,
                         RestClient::getProduct,
                         RestClient::getRating,
