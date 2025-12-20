@@ -6,7 +6,10 @@ import java.util.function.Function;
 public class SubTaskResultImpl<T> implements SubTaskResult<T> {
 
     private final Future<T> future;
-    private Function<Throwable, T> errorHandler = ex -> { throw new RuntimeException(ex); };
+
+    private Function<Throwable, T> errorHandler = ex -> {
+        throw new RuntimeException(ex);
+    };
 
     public SubTaskResultImpl(Future<T> future) {
         this.future = future;

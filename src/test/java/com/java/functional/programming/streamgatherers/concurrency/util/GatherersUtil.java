@@ -6,7 +6,6 @@ import java.util.concurrent.StructuredTaskScope;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Gatherer;
-import java.util.stream.Stream;
 
 public class GatherersUtil {
 
@@ -60,12 +59,12 @@ public class GatherersUtil {
         );
     }
 
-    public static <T, R> Gatherer<T, ?, R> aggregateConcurrent(int maxConcurrency, BiFunction<SubTaskExecutor, T, R> biFunction) {
+    public static <T, R> Gatherer<T, ?, R> aggregateConcurrent(int maxConcurrency, BiFunction<T, SubTaskExecutor, R> biFunction) {
         return Gatherer.ofSequential(
                 () -> {
                     var executor = Executors.newVirtualThreadPerTaskExecutor();
                     var subTaskExecutor = new SubTaskExecutorImpl(executor);
-                    Function<T, R> function = t -> biFunction.apply(subTaskExecutor, t);
+                    Function<T, R> function = t -> biFunction.apply(t, subTaskExecutor);
                     return new ExecuteConcurrent<>(maxConcurrency, function, executor);
                 },
                 Gatherer.Integrator.ofGreedy(ExecuteConcurrent::integrate),
@@ -73,7 +72,7 @@ public class GatherersUtil {
         );
     }
 
-    public static <T, R> Gatherer<T, ?, R> aggregateConcurrent(BiFunction<SubTaskExecutor, T, R> biFunction) {
+    public static <T, R> Gatherer<T, ?, R> aggregateConcurrent(BiFunction<T, SubTaskExecutor, R> biFunction) {
         return aggregateConcurrent(1000, biFunction);
     }
 
@@ -100,7 +99,7 @@ public class GatherersUtil {
                 () -> {
                     var executor = Executors.newVirtualThreadPerTaskExecutor();
                     Function<T, R> function = t -> {
-                        try (var scope = StructuredTaskScope.open(StructuredTaskScope.Joiner.allSuccessfulOrThrow())) {
+                        try (var scope = StructuredTaskScope.open(StructuredTaskScope.Joiner.awaitAllSuccessfulOrThrow())) {
                             var subtask1 = scope.fork(() -> mapperFunction1.apply(t));
                             var subtask2 = scope.fork(() -> mapperFunction2.apply(t));
                             joinAndHandle(scope);
@@ -114,16 +113,11 @@ public class GatherersUtil {
         );
     }
 
-    private static void joinAndHandle(StructuredTaskScope<Object, Stream<StructuredTaskScope.Subtask<Object>>> scope) {
+    private static void joinAndHandle(StructuredTaskScope<Object, Void> scope) {
         try {
-            scope.join(); // With Joiner.awaitAllSuccessfulOrThrow(): cancels on failure and throws
-        } catch (InterruptedException ie) {
-            // Preserve interrupt status and convert to unchecked to keep mapperFunction signatures clean
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while joining subtasks", ie);
-        } catch (Exception ex) {
-            // Joiner may cause join() to throw when a subtask fails (fail-fast semantics in JDK 25)
-            throw new RuntimeException("Subtask failure during join", ex);
+            scope.join();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
