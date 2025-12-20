@@ -1,4 +1,4 @@
-package com.java.functional.programming.streamgatherers.concurrency.util;
+package com.java.functional.programming.streamgatherers.concurrency.util.executorservice;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

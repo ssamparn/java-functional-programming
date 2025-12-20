@@ -1,7 +1,8 @@
 package com.java.functional.programming.streamgatherers.concurrency;
 
 import com.java.functional.programming.streamgatherers.concurrency.externalservice.RestClient;
-import com.java.functional.programming.streamgatherers.concurrency.util.GatherersUtil;
+import com.java.functional.programming.streamgatherers.concurrency.util.GatherersUtilWithExecutorService;
+import com.java.functional.programming.streamgatherers.concurrency.util.GatherersUtilWithStructuredTaskScope;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ public class AggregateConcurrentTest4 {
     public void nestedConcurrencyTest() {
         IntStream.rangeClosed(1, 100)
                 .boxed()
-                .gather(GatherersUtil.aggregateConcurrent(
+                .gather(GatherersUtilWithExecutorService.aggregateConcurrent(
                         10,
                         RestClient::getProduct,
                         RestClient::getRating,
@@ -54,7 +55,7 @@ public class AggregateConcurrentTest4 {
     public void nestedConcurrentWithStructuredTaskScopeTest() {
         IntStream.rangeClosed(1, 100)
                 .boxed()
-                .gather(GatherersUtil.aggregateConcurrentWithStructuredConcurrency(
+                .gather(GatherersUtilWithStructuredTaskScope.aggregateConcurrent(
                         10,
                         RestClient::getProduct,
                         RestClient::getRating,

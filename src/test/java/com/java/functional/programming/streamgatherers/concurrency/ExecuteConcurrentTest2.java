@@ -1,7 +1,7 @@
 package com.java.functional.programming.streamgatherers.concurrency;
 
 import com.java.functional.programming.streamgatherers.concurrency.externalservice.RestClient;
-import com.java.functional.programming.streamgatherers.concurrency.util.GatherersUtil;
+import com.java.functional.programming.streamgatherers.concurrency.util.GatherersUtilWithExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class ExecuteConcurrentTest2 {
     public void executeConcurrentTest() {
         IntStream.rangeClosed(1, 50)
                 .boxed()
-                .gather(GatherersUtil.executeConcurrent(
+                .gather(GatherersUtilWithExecutorService.executeConcurrent(
                         10, RestClient::getProduct))
                 .forEach(log::info);
     }
