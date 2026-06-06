@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Goal is to implement a custom Gatherer to simulate filter behaviour.
+ * Goal is to implement a custom Gatherer to simulate filter behavior.
  */
 @Slf4j
 public class StreamFilterWithGathererTest {
