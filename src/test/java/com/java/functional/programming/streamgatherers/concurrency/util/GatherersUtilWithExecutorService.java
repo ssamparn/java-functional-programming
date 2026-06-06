@@ -78,7 +78,7 @@ public class GatherersUtilWithExecutorService {
         return aggregateConcurrent(1000, biFunction);
     }
 
-    private static <R> R getResult(Future<R> future){
+    private static <R> R getResult(Future<R> future) {
         try {
             return future.get();
         } catch (Exception e) {
