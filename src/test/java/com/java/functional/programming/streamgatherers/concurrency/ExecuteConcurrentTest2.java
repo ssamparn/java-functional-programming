@@ -9,7 +9,8 @@ import java.util.stream.IntStream;
 
 /* *
  * Creates a custom gatherer that sends I/O requests concurrently and emits results in the order they complete;
- * Not in the order they were received.
+ * Not in the order they were received. So basically the order is not preserved.
+ * But in mapConcurrent the order was preserved.
  * */
 @Slf4j
 public class ExecuteConcurrentTest2 {

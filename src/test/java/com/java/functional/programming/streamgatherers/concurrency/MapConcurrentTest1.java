@@ -23,11 +23,12 @@ public class MapConcurrentTest1 {
     }
 
     /**
-     * As we saw, even though many items finish quickly, the stream waits to emit until the next encounter‑ordered element is ready—so one slow task “delays the execution” of everything behind it.
+     * As we saw, even though many items finish quickly, the stream waits to emit until the next encounter‑ordered element is ready — so one slow task “delays the execution” of everything behind it.
      * That behavior is by design for mapConcurrent, which preserves encounter order while running the mapper concurrently on virtual threads.
      *
      * Why this happens?
      * mapConcurrent(maxConcurrency, mapper) runs up to maxConcurrency mapping tasks, but pushes results downstream in the original order.
+     * At any given point of time, we will not make concurrent requests which is more than the maxConcurrency.
      * If element i is slow and i+1 … i+n finish earlier, those faster results are buffered until i is done.
      * On large/unbounded streams this can look like “delays” and may even escalate into memory pressure.
      *
